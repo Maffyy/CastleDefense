@@ -38,7 +38,8 @@ int main(int argc,char **argv) {
 int index = 0;
 void display_callback() {
 	glClear(GL_COLOR_BUFFER_BIT);
-	drawGrid();
+	drawGround();
+	drawCastle();
 	drawSnake();
 	glutSwapBuffers();
 }

@@ -6,5 +6,6 @@
 #define LEFT -2
 
 void initGrid(int, int);
-void drawGrid();
+void drawGround();
+int drawCastle();
 void drawSnake();
