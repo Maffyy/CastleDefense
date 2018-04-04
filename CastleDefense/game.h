@@ -9,3 +9,4 @@ void initGrid(int, int);
 void drawGround();
 void drawCastle();
 void drawCannon();
+void drawEnemy();

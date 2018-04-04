@@ -1,9 +1,6 @@
 #include <GL\glut.h>
-#include <GL\GL.h>
 #include "game.h"
-#include <iostream>
 
-using namespace std;
 
 #define COLUMNS 40
 #define ROWS 40
@@ -45,6 +42,7 @@ void display_callback() {
 	drawGround();
 	drawCastle();
 	drawCannon();
+	drawEnemy();
 	glutSwapBuffers();
 }
 
