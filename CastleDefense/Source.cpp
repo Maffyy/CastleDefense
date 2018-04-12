@@ -45,7 +45,7 @@ void display_callback() {
 	drawEnemy();
 	glutSwapBuffers();
 }
-
+/*oifwjieof*/
 void reshape_callback(int w, int h) {
 	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
 	glMatrixMode(GL_PROJECTION);
