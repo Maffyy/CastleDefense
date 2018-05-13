@@ -24,21 +24,7 @@ public:
 	}
 };
 
-class Boss : public Enemy {
 
-};
-class Minion : public Enemy {
-
-};
-class Cannon {
-public:
-
-};
-
-class Projectile {
-public:
-
-};
 
 class Bullet {
 public:
@@ -109,10 +95,6 @@ int main() {
 	Sound sound;
 	sound.setBuffer(soundbuffer);
 	sound.setVolume(2.f);
-
-	Music music;
-	music.openFromFile("Mountain_king.ogg");
-	music.play();
 
 	Bullet b;
 	Bomb bomb;
