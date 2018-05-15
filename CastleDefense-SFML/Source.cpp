@@ -7,6 +7,20 @@
 #include <math.h>
 #include <vector>
 
+/*
+		Author: Martin Studna, student of Math and Physics faculty, Charles University
+
+		Castle Defense was created as a project to the lecture "Programming in C++" in 2018.
+		In the game you can use three types of weapon: Machine Gun, Laser or Cannon.
+		Three types of enemies (kittens) are in the game: Bosses, Sprinters and Minions, which try to destroy your castle.
+		Each weapon takes enemies different amount of health, each has different reload time and other attributes.
+		Same applies to enemies, they move with different speed and takes your castle different amount of health.
+		Goal of the game is very simple. You have to kill as many kittens as possible and defend your castle!
+*/
+
+
+
+
 using namespace sf;
 
 const float PI = 3.14159265;
@@ -311,7 +325,9 @@ void SwitchGun(int& gun_type, Text& chosen_gun) {
 		break;
 	}
 }
-void MinionSpawn(std::vector<Enemy>& enemies, Texture& enemy_texture, RectangleShape& ground, float windowWidth, int& spawnCounter) {
+void MinionSpawn(std::vector<Enemy>& enemies, Texture& enemy_texture, RectangleShape& ground,
+	float windowWidth, int& spawnCounter) {
+
 	Enemy enemy;
 	enemy.shape.setPosition(Vector2f(windowWidth, ground.getPosition().y - enemy.shape.getSize().y));
 	enemy.shape.setTexture(&enemy_texture);
@@ -320,14 +336,18 @@ void MinionSpawn(std::vector<Enemy>& enemies, Texture& enemy_texture, RectangleS
 	enemies.push_back(Enemy(enemy));
 	spawnCounter = 0;
 }
-void SprinterSpawn(std::vector<Enemy>& enemies, Texture& enemy_texture, RectangleShape& ground, float windowWidth, int& spawnCounter) {
+void SprinterSpawn(std::vector<Enemy>& enemies, Texture& enemy_texture, RectangleShape& ground,
+	float windowWidth, int& spawnCounter) {
+
 	Sprinter sprinter;
 	sprinter.shape.setPosition(Vector2f(windowWidth, ground.getPosition().y - sprinter.shape.getSize().y));
 	sprinter.shape.setTexture(&enemy_texture);
 	enemies.push_back(Sprinter(sprinter));
 	spawnCounter = 0;
 }
-void BossSpawn(std::vector<Enemy>& enemies, Texture& enemy_texture, RectangleShape& ground, float windowWidth, int& spawnCounter) {
+void BossSpawn(std::vector<Enemy>& enemies, Texture& enemy_texture, RectangleShape& ground,
+	float windowWidth, int& spawnCounter) {
+
 	Boss boss;
 	boss.shape.setPosition(Vector2f(windowWidth, ground.getPosition().y - boss.shape.getSize().y));
 	boss.shape.setTexture(&enemy_texture);
