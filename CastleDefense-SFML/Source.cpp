@@ -11,8 +11,6 @@ using namespace sf;
 
 const float PI = 3.14159265;
 
-/*Když sem napisu jen "class Castle;" a definuji Castle za class Enemy, tak na 
-mì prekladac krici, že class Castle is undefined */
 class Castle {
 public:
 	RectangleShape shape;
@@ -35,6 +33,7 @@ void RemoveFrom(std::vector<Elem>& list, int i) {
 		list.pop_back();
 	}
 }
+
 class Enemy {
 public:
 	RectangleShape shape;
@@ -64,6 +63,26 @@ public:
 	}
 
 };
+class Boss : public Enemy {
+public:
+	Boss(float width = 110.f, float height = 200.f) {
+		this->maxSpeed = 2.f;
+		this->hp = 300;
+		this->shape.setSize(Vector2f(width, height));
+		this->shape.setFillColor(Color(255, 0, 0));
+		this->collision = false;
+	}
+};
+class Sprinter : public Enemy {
+public:
+	Sprinter(float width = 100.f, float height = 50.f) {
+		this->hp = 10;
+		this->maxSpeed = 10.f;
+		this->shape.setSize(Vector2f(width, height));
+		this->shape.setFillColor(Color(0, 255, 0));
+		this->collision = false;
+	}
+};
 
 class Bullet {
 public:
@@ -75,9 +94,6 @@ public:
 		: currVelocity(0.f, 0.f), maxSpeed(15.f) {
 		this->shape.setRadius(radius);
 		this->shape.setFillColor(Color::Red);
-	}
-	void CollideWithEnemy() {
-
 	}
 
 };
@@ -123,7 +139,7 @@ public:
 	float radius;
 
 	Bomb()
-		: currVelocity(0.f, 0.f), maxSpeed(15.f), radius(10.f) {
+		: currVelocity(0.f, 0.f), maxSpeed(12.f), radius(10.f) {
 		this->shape.setRadius(radius);
 		this->shape.setFillColor(Color::Yellow);
 	}
@@ -151,8 +167,6 @@ public:
 	}
 };
 
-
-
 struct GameState {
 
 	float windowWidth;
@@ -161,7 +175,6 @@ struct GameState {
 	SoundBuffer soundbuffer;
 	Sound sound;
 
-	Enemy enemy;
 	Castle castle;
 	Cannon cannon;
 
@@ -181,9 +194,6 @@ struct GameState {
 	int spawnCounter;
 	int gun_type;
 	int killed;
-
-	std::string score;
-	std::string gun;
 
 	Font font;
 	Text chosen_gun;
@@ -217,8 +227,6 @@ void Init(GameState& gameState, RenderWindow& window) {
 	gameState.spawnCounter = 40;
 	gameState.gun_type = 0;
 	gameState.killed = 0;
-	gameState.score = "Score: ";
-	gameState.gun = "Weapon: ";
 
 	if (!gameState.soundbuffer.loadFromFile("meow.wav")) {
 		std::cout << "Sound has not been loaded!" << std::endl;
@@ -232,13 +240,13 @@ void Init(GameState& gameState, RenderWindow& window) {
 	}
 
 	gameState.chosen_gun.setFont(gameState.font);
-	gameState.chosen_gun.setString(gameState.gun);
+	gameState.chosen_gun.setString("Weapon: ");
 	gameState.chosen_gun.setCharacterSize(20);
 	gameState.chosen_gun.setPosition(Vector2f(770, 20));
 	gameState.chosen_gun.setStyle(Text::Bold);
 
 	gameState.killed_enemies.setFont(gameState.font);
-	gameState.killed_enemies.setString(gameState.score);
+	gameState.killed_enemies.setString("Score: ");
 	gameState.killed_enemies.setCharacterSize(20);
 	gameState.killed_enemies.setPosition(Vector2f(600, 20));
 	gameState.killed_enemies.setStyle(Text::Bold);
@@ -286,16 +294,16 @@ void Init(GameState& gameState, RenderWindow& window) {
 
 }
 
-void SwitchGun(int& gun_type, Text& chosen_gun, std::string& gun) {
+void SwitchGun(int& gun_type, Text& chosen_gun) {
 	switch (gun_type) {
 	case 0:
-		chosen_gun.setString(gun + "Machine Gun");
+		chosen_gun.setString("Weapon: Machine Gun");
 		break;
 	case 1:
-		chosen_gun.setString(gun + "Cannon");
+		chosen_gun.setString("Weapon: Cannon");
 		break;
 	case 2:
-		chosen_gun.setString(gun + "Laser");
+		chosen_gun.setString("Weapon: Laser");
 		break;
 	default:
 		break;
@@ -309,11 +317,35 @@ void EnemySpawn(int& spawnCounter, Enemy& enemy, std::vector<Enemy>& enemies,
 		spawnCounter++;
 	}
 	else {
-		enemy.shape.setPosition(Vector2f(windowWidth, ground.getPosition().y - enemy.shape.getSize().y));
-		enemy.shape.setTexture(&enemy_texture);
-		enemy.dir = Vector2f(-(rand() % 5), 0.f);
-		enemies.push_back(Enemy(enemy));
-		spawnCounter = 0;
+		int choose_enemy = rand() % 3;
+		if (choose_enemy == 0) {
+			std::cout << "Enemy" << std::endl;
+			Enemy enemy;
+			enemy.shape.setPosition(Vector2f(windowWidth, ground.getPosition().y - enemy.shape.getSize().y));
+			enemy.shape.setTexture(&enemy_texture);
+			int speed = enemy.maxSpeed;
+			enemy.dir = Vector2f(-(rand() % speed), 0.f);
+			enemies.push_back(Enemy(enemy));
+			spawnCounter = 0;
+		}
+		if (choose_enemy == 1) {
+			std::cout << "Boss" << std::endl;
+			Boss boss;
+			boss.shape.setPosition(Vector2f(windowWidth, ground.getPosition().y - boss.shape.getSize().y));
+			boss.shape.setTexture(&enemy_texture);
+			boss.dir = Vector2f(-boss.maxSpeed, 0.f);
+			enemies.push_back(Boss(boss));
+			spawnCounter = 0;
+		}
+		if (choose_enemy == 2) {
+			std::cout << "Sprinter" << std::endl;
+			Sprinter sprinter;
+			sprinter.shape.setPosition(Vector2f(windowWidth, ground.getPosition().y - sprinter.shape.getSize().y));
+			sprinter.shape.setTexture(&enemy_texture);
+			sprinter.dir = Vector2f(-sprinter.maxSpeed, 0.f);
+			enemies.push_back(Sprinter(sprinter));
+			spawnCounter = 0;
+		}
 	}
 }
 
@@ -342,22 +374,22 @@ void ShootLaser(std::vector<Laser>& lasers, bool& laser_fired, int& laser_reload
 		lasers.push_back(Laser(laser));
 		laser_fired = true;
 	}
-	
+
 }
 
 void ShootBomb(std::vector<Bomb>& bombs, int& bomb_counter, int& bomb_reload, Cannon& cannon) {
-	if (bomb_counter != 10) {
+	if (bomb_counter != 60) {
 		Bomb bomb;
 		bomb.shape.setPosition(cannon.cannonHead);
 		bomb.currVelocity = cannon.aimDirNorm * bomb.maxSpeed;
 		bombs.push_back(Bomb(bomb));
 		bomb_counter++;
 	}
-	
+
 }
 
 void ShootBullet(std::vector<Bullet>& bullets, int& bullet_counter, int& bullet_reload, Cannon& cannon) {
-	if (bullet_counter != 10) {
+	if (bullet_counter != 150) {
 		Bullet bullet;
 		bullet_counter++;
 		bullet.shape.setPosition(cannon.cannonHead);
@@ -365,8 +397,6 @@ void ShootBullet(std::vector<Bullet>& bullets, int& bullet_counter, int& bullet_
 		bullets.push_back(Bullet(bullet));
 	}
 }
-
-
 
 void Shoot(GameState& gameState) {
 
@@ -388,26 +418,25 @@ void Shoot(GameState& gameState) {
 	if (gameState.laser_fired) {
 		gameState.laser_reload++;
 	}
-	if (gameState.laser_reload == 50) {
+	if (gameState.laser_reload == 100) {
 		gameState.laser_reload = 0;
 		gameState.laser_fired = false;
 	}
-	if (gameState.bomb_counter == 10) {
+	if (gameState.bomb_counter == 60) {
 		gameState.bomb_reload++;
 	}
-	if (gameState.bomb_reload == 30) {
+	if (gameState.bomb_reload == 150) {
 		gameState.bomb_reload = 0;
 		gameState.bomb_counter = 0;
 	}
-	if (gameState.bullet_counter == 10) {
+	if (gameState.bullet_counter == 150) {
 		gameState.bullet_reload++;
 	}
-	if (gameState.bullet_reload == 20) {
+	if (gameState.bullet_reload == 300) {
 		gameState.bullet_counter = 0;
 		gameState.bullet_reload = 0;
 	}
 }
-
 
 void DetectBulletCollisions(std::vector<Enemy>& enemies, std::vector<Bullet>& bullets,
 	RenderWindow& window, int& killed, Sound& sound) {
@@ -454,7 +483,7 @@ void DetectBombCollisions(std::vector<Enemy>& enemies, std::vector<Bomb>& bombs,
 	Sound& sound, RenderWindow& window, RectangleShape& ground) {
 
 	for (size_t i = 0; i < bombs.size(); i++) {
-		bombs[i].currVelocity.y += 0.5f;
+		bombs[i].currVelocity.y += 0.2f;
 		bombs[i].shape.move(bombs[i].currVelocity);
 
 		if (bombs[i].shape.getPosition().x < 0 || bombs[i].shape.getPosition().x > window.getSize().x
@@ -466,7 +495,7 @@ void DetectBombCollisions(std::vector<Enemy>& enemies, std::vector<Bomb>& bombs,
 		else {
 			for (size_t j = 0; j < enemies.size(); j++) {
 				if (bombs[i].shape.getGlobalBounds().intersects(enemies[j].shape.getGlobalBounds())) {
-					RemoveFrom(bombs,i);
+					RemoveFrom(bombs, i);
 					enemies[j].hp -= 40;
 					if (enemies[j].hp <= 0) {
 						RemoveFrom(enemies, j);
@@ -481,7 +510,7 @@ void DetectBombCollisions(std::vector<Enemy>& enemies, std::vector<Bomb>& bombs,
 
 void Update(GameState& gameState, RenderWindow& window) {
 
-	SwitchGun(gameState.gun_type, gameState.chosen_gun, gameState.gun);
+	SwitchGun(gameState.gun_type, gameState.chosen_gun);
 
 	// Cannon rotation
 	gameState.cannon.mousePosWindow = Vector2f(Mouse::getPosition(window));
@@ -498,7 +527,7 @@ void Update(GameState& gameState, RenderWindow& window) {
 	if (Mouse::isButtonPressed(Mouse::Left)) {
 		Shoot(gameState);
 	}
-	
+
 
 	// Enemy collision
 
@@ -513,7 +542,7 @@ void Update(GameState& gameState, RenderWindow& window) {
 	DetectBombCollisions(gameState.enemies, gameState.bombs, gameState.killed, gameState.sound, window, gameState.ground);
 
 
-	gameState.killed_enemies.setString(gameState.score + std::to_string(gameState.killed));
+	gameState.killed_enemies.setString("Score: " + std::to_string(gameState.killed));
 
 }
 void Draw(GameState& gameState, RenderWindow& window) {
