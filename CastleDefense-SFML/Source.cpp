@@ -65,8 +65,9 @@ public:
 };
 class Boss : public Enemy {
 public:
-	Boss(float width = 110.f, float height = 200.f) {
+	Boss(float width = 100.f, float height = 150.f) {
 		this->maxSpeed = 2.f;
+		this->dir = Vector2f(-maxSpeed, 0.f);
 		this->hp = 300;
 		this->shape.setSize(Vector2f(width, height));
 		this->shape.setFillColor(Color(255, 0, 0));
@@ -78,6 +79,7 @@ public:
 	Sprinter(float width = 100.f, float height = 50.f) {
 		this->hp = 10;
 		this->maxSpeed = 10.f;
+		this->dir = Vector2f(-maxSpeed, 0.f);
 		this->shape.setSize(Vector2f(width, height));
 		this->shape.setFillColor(Color(0, 255, 0));
 		this->collision = false;
@@ -309,6 +311,29 @@ void SwitchGun(int& gun_type, Text& chosen_gun) {
 		break;
 	}
 }
+void MinionSpawn(std::vector<Enemy>& enemies, Texture& enemy_texture, RectangleShape& ground, float windowWidth, int& spawnCounter) {
+	Enemy enemy;
+	enemy.shape.setPosition(Vector2f(windowWidth, ground.getPosition().y - enemy.shape.getSize().y));
+	enemy.shape.setTexture(&enemy_texture);
+	int speed = enemy.maxSpeed;
+	enemy.dir = Vector2f(-(rand() % speed), 0.f);
+	enemies.push_back(Enemy(enemy));
+	spawnCounter = 0;
+}
+void SprinterSpawn(std::vector<Enemy>& enemies, Texture& enemy_texture, RectangleShape& ground, float windowWidth, int& spawnCounter) {
+	Sprinter sprinter;
+	sprinter.shape.setPosition(Vector2f(windowWidth, ground.getPosition().y - sprinter.shape.getSize().y));
+	sprinter.shape.setTexture(&enemy_texture);
+	enemies.push_back(Sprinter(sprinter));
+	spawnCounter = 0;
+}
+void BossSpawn(std::vector<Enemy>& enemies, Texture& enemy_texture, RectangleShape& ground, float windowWidth, int& spawnCounter) {
+	Boss boss;
+	boss.shape.setPosition(Vector2f(windowWidth, ground.getPosition().y - boss.shape.getSize().y));
+	boss.shape.setTexture(&enemy_texture);
+	enemies.push_back(Boss(boss));
+	spawnCounter = 0;
+}
 
 void EnemySpawn(int& spawnCounter, Enemy& enemy, std::vector<Enemy>& enemies,
 	float windowWidth, RectangleShape& ground, Texture& enemy_texture) {
@@ -319,32 +344,13 @@ void EnemySpawn(int& spawnCounter, Enemy& enemy, std::vector<Enemy>& enemies,
 	else {
 		int choose_enemy = rand() % 3;
 		if (choose_enemy == 0) {
-			std::cout << "Enemy" << std::endl;
-			Enemy enemy;
-			enemy.shape.setPosition(Vector2f(windowWidth, ground.getPosition().y - enemy.shape.getSize().y));
-			enemy.shape.setTexture(&enemy_texture);
-			int speed = enemy.maxSpeed;
-			enemy.dir = Vector2f(-(rand() % speed), 0.f);
-			enemies.push_back(Enemy(enemy));
-			spawnCounter = 0;
+			MinionSpawn(enemies, enemy_texture, ground, windowWidth, spawnCounter);
 		}
 		if (choose_enemy == 1) {
-			std::cout << "Boss" << std::endl;
-			Boss boss;
-			boss.shape.setPosition(Vector2f(windowWidth, ground.getPosition().y - boss.shape.getSize().y));
-			boss.shape.setTexture(&enemy_texture);
-			boss.dir = Vector2f(-boss.maxSpeed, 0.f);
-			enemies.push_back(Boss(boss));
-			spawnCounter = 0;
+			BossSpawn(enemies, enemy_texture, ground, windowWidth, spawnCounter);
 		}
 		if (choose_enemy == 2) {
-			std::cout << "Sprinter" << std::endl;
-			Sprinter sprinter;
-			sprinter.shape.setPosition(Vector2f(windowWidth, ground.getPosition().y - sprinter.shape.getSize().y));
-			sprinter.shape.setTexture(&enemy_texture);
-			sprinter.dir = Vector2f(-sprinter.maxSpeed, 0.f);
-			enemies.push_back(Sprinter(sprinter));
-			spawnCounter = 0;
+			SprinterSpawn(enemies, enemy_texture, ground, windowWidth, spawnCounter);
 		}
 	}
 }
